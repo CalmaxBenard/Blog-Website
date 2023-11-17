@@ -311,8 +311,7 @@ def contact():
                 to_addrs="qwriters17@gmail.com",
                 msg=f"New Company Message\n\nFrom\nName: {username}\nEmail: {email}\nTel: {tel}\nMessage: {message}"
             )
-        return redirect(url_for("contact", feedback=success_msg))
-    return render_template("contact.html", current_user=current_user)
+    return render_template("contact.html", current_user=current_user, feedback=success_msg)
 
 
 if __name__ == "__main__":
