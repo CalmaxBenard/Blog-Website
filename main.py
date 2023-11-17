@@ -18,7 +18,7 @@ ckeditor = CKEditor(app)
 Bootstrap5(app)
 
 my_email = os.environ.get("MY_EMAIL")
-password = os.environ.get("PASSWORD")
+my_password = os.environ.get("PASSWORD")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -305,7 +305,7 @@ def contact():
         success_msg = "Successfully Delivered. Thank you!"
         with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
             connection.starttls()
-            connection.login(my_email, password)
+            connection.login(my_email, my_password)
             connection.sendmail(
                 from_addr=my_email,
                 to_addrs="qwriters17@gmail.com",
