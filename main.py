@@ -295,12 +295,14 @@ def about():
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
+    success_msg = "Contact Me"
     if request.method == "POST":
         data = request.form
         username = data["name"]
         email = data["email"]
         tel = data["phone"]
         message = data["message"]
+        success_msg = "Successfully Delivered. Thank you!"
         with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
             connection.starttls()
             connection.login(my_email, password)
@@ -309,7 +311,7 @@ def contact():
                 to_addrs="qwriters17@gmail.com",
                 msg=f"New Company Message\n\nFrom\nName: {username}\nEmail: {email}\nTel: {tel}\nMessage: {message}"
             )
-        return redirect(url_for("contact", msg_sent=True))
+        return redirect(url_for("contact", feedback=success_msg))
     return render_template("contact.html", current_user=current_user)
 
 
