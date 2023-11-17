@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from flask import Flask, abort, render_template, redirect, url_for, flash
+from flask import Flask, abort, render_template, redirect, url_for, flash, request
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_gravatar import Gravatar
@@ -10,11 +10,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 import os
+import smtplib
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("FLASK_API")
 ckeditor = CKEditor(app)
 Bootstrap5(app)
+
+my_email = os.environ.get("MY_EMAIL")
+password = os.environ.get("PASSWORD")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -289,8 +293,23 @@ def about():
     return render_template("about.html", current_user=current_user)
 
 
-@app.route("/contact")
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
+    if request.method == "POST":
+        data = request.form
+        username = data["name"]
+        email = data["email"]
+        tel = data["phone"]
+        message = data["message"]
+        with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+            connection.starttls()
+            connection.login(my_email, password)
+            connection.sendmail(
+                from_addr=my_email,
+                to_addrs="qwriters17@gmail.com",
+                msg=f"New Company Message\n\nFrom\nName: {username}\nEmail: {email}\nTel: {tel}\nMessage: {message}"
+            )
+        return redirect(url_for("contact", msg_sent=True))
     return render_template("contact.html", current_user=current_user)
 
 
