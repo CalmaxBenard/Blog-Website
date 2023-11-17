@@ -16,7 +16,6 @@ app.config['SECRET_KEY'] = os.environ.get("FLASK_API")
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
-# TODO: Configure Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 
