@@ -13,7 +13,7 @@ import os
 import smtplib
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get("FLASK_API")
+app.config['SECRET_KEY'] = "fgfdyruyiiiiiiiiinjjrdwres"
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
@@ -185,8 +185,8 @@ def admin_only(f):
 def only_commenter(func):
     @wraps(func)
     def check_user(*args, **kwargs):
-        user = db.session.execute(db.select(Comment).where(Comment.author_id == current_user.id)).scalar()
-        if not current_user.is_authenticated and current_user.id != user.author_id:
+        comment = db.session.execute(db.select(Comment).where(Comment.author_id == current_user.id)).scalar()
+        if current_user.id != comment.author_id:
             return abort(403)
         return func(*args, **kwargs)
     return check_user
@@ -285,7 +285,7 @@ def delete_comment(post_id, comment_id):
     post_to_delete = db.get_or_404(Comment, comment_id)
     db.session.delete(post_to_delete)
     db.session.commit()
-    return redirect(url_for("show_post", post_id=post_id))
+    return redirect(url_for("show_post", post_id=post_id, current_user=current_user))
 
 
 @app.route("/about")
@@ -295,14 +295,12 @@ def about():
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
-    success_msg = "Contact Me"
     if request.method == "POST":
         data = request.form
         username = data["name"]
         email = data["email"]
         tel = data["phone"]
         message = data["message"]
-        success_msg = "Successfully Delivered. Thank you!"
         with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
             connection.starttls()
             connection.login(my_email, my_password)
@@ -311,7 +309,8 @@ def contact():
                 to_addrs="qwriters17@gmail.com",
                 msg=f"New Company Message\n\nFrom\nName: {username}\nEmail: {email}\nTel: {tel}\nMessage: {message}"
             )
-    return render_template("contact.html", current_user=current_user, feedback=success_msg)
+            return render_template("contact.html", msg_sent=True)
+    return render_template("contact.html", msg_sent=False)
 
 
 if __name__ == "__main__":
